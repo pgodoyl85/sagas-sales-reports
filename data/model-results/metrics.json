@@ -1,0 +1,52 @@
+{
+  "data": {
+    "source_name": "sagas-music-shop_Pedidos_2026-06-25.csv",
+    "orders": 524,
+    "paid_orders": 485,
+    "cancelled_orders": 39,
+    "cancellation_rate": 0.07442748091603053,
+    "date_min": "2026-03-28T01:32:00",
+    "date_max": "2026-06-25T09:55:00",
+    "unique_customers_ephemeral": 479
+  },
+  "temporal_split": {
+    "train_orders": 367,
+    "train_end": "2026-05-25T12:53:00",
+    "train_cancellations": 21,
+    "test_orders": 157,
+    "test_start": "2026-05-25T16:45:00",
+    "test_cancellations": 18,
+    "test_prevalence": 0.11464968152866242
+  },
+  "logistic": {
+    "best_params": {
+      "model__C": 0.05,
+      "model__class_weight": null
+    },
+    "cv_roc_auc": 0.6981365868851038,
+    "test_roc_auc": 0.7154276578737011,
+    "test_roc_auc_ci95": [
+      0.5663855638178533,
+      0.8452565662237197
+    ],
+    "test_pr_auc": 0.2765707314759295,
+    "test_pr_baseline": 0.11464968152866242,
+    "test_brier": 0.09814789178107312,
+    "lift_at_20pct": 2.1805555555555554,
+    "cancellations_captured_at_20pct": 8,
+    "cancellation_capture_rate_at_20pct": 0.4444444444444444,
+    "cancelled_gmv_captured_at_20pct_clp": 2268512.0,
+    "cancelled_gmv_capture_rate_at_20pct": 0.6764862265627912
+  },
+  "random_forest": {
+    "cv_roc_auc": 0.6912442344836496,
+    "test_roc_auc": 0.6316946442845723,
+    "test_pr_auc": 0.18137143502185482,
+    "test_brier": 0.24209373141373083
+  },
+  "interpretation": {
+    "production_readiness": "No apto para puja o asignación automática de presupuesto",
+    "safe_use": "Ranking operativo para priorizar rescate de pedidos, con holdout aleatorio",
+    "auc_assessment": "Señal moderada e incierta por muestra pequeña y deriva temporal"
+  }
+}

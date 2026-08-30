@@ -1,0 +1,18 @@
+scope,segment,users_or_sessions,revenue_clp,share_volume,share_revenue,period,source_note
+channel,Paid Social,29335,339860,0.7164,0.0721,2026-08-01/2026-08-28,GA4 authenticated UI snapshot
+channel,Paid Search,3004,1052290,0.0734,0.2233,2026-08-01/2026-08-28,GA4 authenticated UI snapshot
+channel,Organic Search,2261,877701,0.0552,0.1862,2026-08-01/2026-08-28,GA4 authenticated UI snapshot
+channel,Direct,2024,1447436,0.0494,0.3071,2026-08-01/2026-08-28,GA4 authenticated UI snapshot
+channel,Cross-network,1676,279671,0.0409,0.0593,2026-08-01/2026-08-28,GA4 authenticated UI snapshot
+channel,Organic Social,1632,0,0.0399,0.0000,2026-08-01/2026-08-28,GA4 authenticated UI snapshot
+channel,Organic Shopping,241,715993,0.0059,0.1519,2026-08-01/2026-08-28,GA4 authenticated UI snapshot
+region,Santiago,15288,3134235,,0.6650,2026-08-01/2026-08-28,GA4 authenticated UI snapshot
+region,Biobío,2157,229990,,0.0488,2026-08-01/2026-08-28,GA4 authenticated UI snapshot
+region,Valparaíso,1582,199990,,0.0424,2026-08-01/2026-08-28,GA4 authenticated UI snapshot
+region,Araucanía,897,0,,0.0000,2026-08-01/2026-08-28,GA4 authenticated UI snapshot
+region,Antofagasta,838,179980,,0.0382,2026-08-01/2026-08-28,GA4 authenticated UI snapshot
+region,Los Lagos,604,127596,,0.0271,2026-08-01/2026-08-28,GA4 authenticated UI snapshot
+region,Maule,552,20680,,0.0044,2026-08-01/2026-08-28,GA4 authenticated UI snapshot
+region,O’Higgins,534,0,,0.0000,2026-08-01/2026-08-28,GA4 authenticated UI snapshot
+region,Coquimbo,479,155950,,0.0331,2026-08-01/2026-08-28,GA4 authenticated UI snapshot
+region,Ñuble,224,499540,,0.1060,2026-08-01/2026-08-28,GA4 authenticated UI snapshot

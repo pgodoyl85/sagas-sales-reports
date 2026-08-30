@@ -1,0 +1,1100 @@
+{
+  "surface": "report",
+  "manifest": {
+    "version": 1,
+    "surface": "report",
+    "title": "Estrategia de ventas y campañas · Sagás",
+    "description": "Auditoría de datos, modelo de riesgo de cancelación y plan de experimentos de canal y geografía.",
+    "generatedAt": "2026-08-29T21:25:00-04:00",
+    "sources": [
+      {
+        "id": "src_model",
+        "label": "Backtest temporal del modelo",
+        "path": "data/model-results/metrics.json",
+        "query": {
+          "engine": "duckdb",
+          "sql": "SELECT * FROM read_json_auto('data/model-results/metrics.json')",
+          "language": "sql",
+          "description": "Regresión logística regularizada y random forest comparados con TimeSeriesSplit; holdout final = 30% más reciente.",
+          "tables_used": [
+            "data/model-results/metrics.json"
+          ],
+          "filters": [
+            "Estado de Pago en Pagado/Cancelada",
+            "Fecha y Total válidos",
+            "Sólo variables disponibles al crear el pedido"
+          ],
+          "metric_definitions": [
+            "ROC-AUC: probabilidad de ordenar un cancelado por encima de un pagado.",
+            "PR-AUC: precisión promedio a lo largo de niveles de recall; baseline = prevalencia del holdout.",
+            "Lift@20%: tasa de cancelación del 20% con mayor score dividida por la tasa del holdout."
+          ],
+          "executed_at": "2026-08-29T21:20:00-04:00"
+        }
+      },
+      {
+        "id": "src_lift",
+        "label": "Curva de lift del holdout",
+        "path": "data/model-results/lift_curve.csv",
+        "query": {
+          "engine": "duckdb",
+          "sql": "SELECT * FROM read_csv_auto('data/model-results/lift_curve.csv', header=true)",
+          "language": "sql",
+          "description": "Pedidos del holdout ordenados por score descendente y acumulados por profundidad de contacto.",
+          "tables_used": [
+            "data/model-results/lift_curve.csv"
+          ],
+          "filters": [
+            "Holdout temporal: 157 pedidos posteriores a 2026-05-25 16:45"
+          ],
+          "metric_definitions": [
+            "Capture rate: cancelaciones dentro del tramo / 18 cancelaciones del holdout."
+          ],
+          "executed_at": "2026-08-29T21:20:00-04:00"
+        }
+      },
+      {
+        "id": "src_geo",
+        "label": "Pedidos históricos agregados por región",
+        "path": "data/model-results/geo_segments.csv",
+        "query": {
+          "engine": "duckdb",
+          "sql": "SELECT * FROM read_csv_auto('data/model-results/geo_segments.csv', header=true) WHERE orders >= 10",
+          "language": "sql",
+          "description": "Agregación sin PII de pedidos, cancelaciones, ingreso pagado y ticket promedio por región.",
+          "tables_used": [
+            "data/model-results/geo_segments.csv"
+          ],
+          "filters": [
+            "Regiones con al menos 10 pedidos en la tabla/gráfico principal"
+          ],
+          "metric_definitions": [
+            "Tasa de cancelación = cancelaciones / pedidos.",
+            "Ticket pagado = ingreso de pedidos pagados / pedidos pagados."
+          ],
+          "executed_at": "2026-08-29T21:20:00-04:00"
+        }
+      },
+      {
+        "id": "src_ga4",
+        "label": "GA4 Sagasmusicshop.cl · snapshot autenticado",
+        "path": "data/ga4_snapshot_2026-08-29.csv",
+        "query": {
+          "engine": "duckdb",
+          "sql": "SELECT * FROM read_csv_auto('data/ga4_snapshot_2026-08-29.csv', header=true) WHERE scope IN ('channel', 'region')",
+          "description": "Lectura agregada de Traffic acquisition y Demographic details en GA4.",
+          "tables_used": [
+            "data/ga4_snapshot_2026-08-29.csv"
+          ],
+          "filters": [
+            "Periodo 2026-08-01 a 2026-08-28",
+            "Default channel group o Region"
+          ],
+          "metric_definitions": [
+            "Share de sesiones = sesiones del canal / 40.948 sesiones.",
+            "Share de ingresos = ingreso del canal / CLP 4.712.951.",
+            "Ingreso por mil sesiones = ingreso / sesiones × 1.000; no equivale a ROAS porque falta costo."
+          ],
+          "executed_at": "2026-08-29T20:25:00-04:00",
+          "language": "sql"
+        }
+      },
+      {
+        "id": "src_shipping",
+        "label": "Pedidos históricos agregados por despacho",
+        "path": "data/model-results/shipping_segments.csv",
+        "query": {
+          "engine": "duckdb",
+          "sql": "SELECT * FROM read_csv_auto('data/model-results/shipping_segments.csv', header=true) WHERE orders >= 20",
+          "language": "sql",
+          "description": "Agregación sin PII por método de envío.",
+          "tables_used": [
+            "data/model-results/shipping_segments.csv"
+          ],
+          "filters": [
+            "Métodos con al menos 20 pedidos"
+          ],
+          "metric_definitions": [
+            "Tasa de cancelación = cancelaciones / pedidos."
+          ],
+          "executed_at": "2026-08-29T21:20:00-04:00"
+        }
+      }
+    ],
+    "cards": [
+      {
+        "id": "card_auc",
+        "dataset": "kpis",
+        "sourceId": "src_model",
+        "description": "Discriminación en pedidos más recientes; intervalo bootstrap amplio.",
+        "metrics": [
+          {
+            "label": "AUC holdout",
+            "field": "auc",
+            "format": "number"
+          },
+          {
+            "label": "IC 95% bajo",
+            "field": "auc_ci_low",
+            "format": "number"
+          },
+          {
+            "label": "IC 95% alto",
+            "field": "auc_ci_high",
+            "format": "number"
+          }
+        ]
+      },
+      {
+        "id": "card_pr",
+        "dataset": "kpis",
+        "sourceId": "src_model",
+        "description": "Más informativo que accuracy con sólo 11,5% de cancelaciones en test.",
+        "metrics": [
+          {
+            "label": "PR-AUC",
+            "field": "pr_auc",
+            "format": "number"
+          },
+          {
+            "label": "Baseline",
+            "field": "pr_baseline",
+            "format": "number"
+          }
+        ]
+      },
+      {
+        "id": "card_lift",
+        "dataset": "kpis",
+        "sourceId": "src_model",
+        "description": "Concentración de cancelaciones al priorizar el 20% con mayor score.",
+        "metrics": [
+          {
+            "label": "Lift @20%",
+            "field": "lift20",
+            "format": "number"
+          },
+          {
+            "label": "Captura",
+            "field": "capture20",
+            "format": "percent"
+          }
+        ]
+      },
+      {
+        "id": "card_gmv",
+        "dataset": "kpis",
+        "sourceId": "src_model",
+        "description": "GMV cancelado históricamente concentrado en el 20% superior; no es ingreso recuperado.",
+        "metrics": [
+          {
+            "label": "GMV cancelado priorizado",
+            "field": "gmv_capture_clp",
+            "format": "currency"
+          },
+          {
+            "label": "Share del GMV cancelado",
+            "field": "gmv_capture_share",
+            "format": "percent"
+          }
+        ]
+      }
+    ],
+    "charts": [
+      {
+        "id": "chart_lift",
+        "title": "Cancelaciones capturadas por profundidad de contacto",
+        "subtitle": "El 20% superior concentra 44,4% de cancelaciones; la diagonal representa selección aleatoria.",
+        "type": "line",
+        "dataset": "lift",
+        "sourceId": "src_lift",
+        "layout": "full",
+        "encodings": {
+          "x": {
+            "field": "population_pct",
+            "type": "quantitative",
+            "format": "percent",
+            "label": "Pedidos priorizados"
+          },
+          "y": {
+            "fields": [
+              "capture_rate",
+              "random_capture_rate"
+            ],
+            "type": "quantitative",
+            "format": "percent",
+            "label": "Cancelaciones capturadas"
+          }
+        },
+        "valueFormat": "percent",
+        "referenceLines": [
+          {
+            "axis": "x",
+            "value": 0.2,
+            "label": "20%"
+          }
+        ]
+      },
+      {
+        "id": "chart_channel_share",
+        "title": "Participación de sesiones e ingresos por canal",
+        "subtitle": "Paid Social domina el tráfico; Paid Search, Direct y Organic Search concentran mucho más ingreso relativo.",
+        "type": "bar",
+        "dataset": "channel_shares",
+        "sourceId": "src_ga4",
+        "layout": "full",
+        "encodings": {
+          "x": {
+            "field": "segment",
+            "type": "nominal",
+            "label": "Canal"
+          },
+          "y": {
+            "field": "share",
+            "type": "quantitative",
+            "format": "percent",
+            "label": "Participación"
+          },
+          "color": {
+            "field": "measure",
+            "type": "nominal",
+            "label": "Métrica"
+          },
+          "tooltip": [
+            {
+              "field": "users_or_sessions",
+              "format": "compact",
+              "label": "Sesiones"
+            },
+            {
+              "field": "revenue_clp",
+              "format": "currency",
+              "label": "Ingreso"
+            },
+            {
+              "field": "revenue_per_1000_sessions_clp",
+              "format": "currency",
+              "label": "Ingreso / 1.000 sesiones"
+            }
+          ]
+        },
+        "surface": {
+          "orientation": "vertical",
+          "grouping": "grouped"
+        }
+      },
+      {
+        "id": "chart_geo",
+        "title": "Ticket pagado y cancelación histórica por región",
+        "subtitle": "Tamaño = número de pedidos; usar como mapa de hipótesis, no como criterio de exclusión.",
+        "type": "scatter",
+        "dataset": "geo",
+        "sourceId": "src_geo",
+        "layout": "full",
+        "encodings": {
+          "x": {
+            "field": "paid_aov_clp",
+            "type": "quantitative",
+            "format": "currency",
+            "label": "Ticket pagado"
+          },
+          "y": {
+            "field": "cancellation_rate",
+            "type": "quantitative",
+            "format": "percent",
+            "label": "Cancelación"
+          },
+          "size": {
+            "field": "orders",
+            "type": "quantitative",
+            "label": "Pedidos"
+          },
+          "label": {
+            "field": "region",
+            "type": "text",
+            "label": "Región"
+          },
+          "tooltip": [
+            {
+              "field": "region",
+              "label": "Región"
+            },
+            {
+              "field": "orders",
+              "format": "number",
+              "label": "Pedidos"
+            },
+            {
+              "field": "paid_revenue_clp",
+              "format": "currency",
+              "label": "Ingreso pagado"
+            }
+          ]
+        }
+      }
+    ],
+    "tables": [
+      {
+        "id": "table_stability",
+        "title": "Estabilidad fuera de tiempo",
+        "subtitle": "Sólo meses con al menos 200 pedidos previos de entrenamiento.",
+        "dataset": "stability",
+        "sourceId": "src_model",
+        "defaultSort": {
+          "field": "test_month",
+          "direction": "asc"
+        },
+        "columns": [
+          {
+            "field": "test_month",
+            "label": "Mes",
+            "type": "text"
+          },
+          {
+            "field": "train_orders",
+            "label": "Train",
+            "format": "number"
+          },
+          {
+            "field": "train_cancellations",
+            "label": "Cancel. train",
+            "format": "number"
+          },
+          {
+            "field": "test_orders",
+            "label": "Test",
+            "format": "number"
+          },
+          {
+            "field": "test_cancellations",
+            "label": "Cancel. test",
+            "format": "number"
+          },
+          {
+            "field": "roc_auc",
+            "label": "ROC-AUC",
+            "format": "number"
+          },
+          {
+            "field": "pr_auc",
+            "label": "PR-AUC",
+            "format": "number"
+          },
+          {
+            "field": "prevalence",
+            "label": "Baseline",
+            "format": "percent"
+          }
+        ]
+      },
+      {
+        "id": "table_shipping",
+        "title": "Fricción por método de envío",
+        "subtitle": "Segmentos con 20+ pedidos; no controla por ticket, región o mix de productos.",
+        "dataset": "shipping",
+        "sourceId": "src_shipping",
+        "defaultSort": {
+          "field": "cancellation_rate",
+          "direction": "desc"
+        },
+        "columns": [
+          {
+            "field": "shipping_method",
+            "label": "Método",
+            "type": "text"
+          },
+          {
+            "field": "orders",
+            "label": "Pedidos",
+            "format": "number"
+          },
+          {
+            "field": "cancellations",
+            "label": "Cancelaciones",
+            "format": "number"
+          },
+          {
+            "field": "cancellation_rate",
+            "label": "Tasa cancelación",
+            "format": "percent"
+          },
+          {
+            "field": "paid_aov_clp",
+            "label": "Ticket pagado",
+            "format": "currency"
+          }
+        ]
+      }
+    ],
+    "blocks": [
+      {
+        "id": "title",
+        "type": "markdown",
+        "body": "# Estrategia de ventas y campañas · Sagás"
+      },
+      {
+        "id": "executive",
+        "type": "markdown",
+        "body": "## Executive Summary\n\n- **Mantener la estrategia de capturar demanda rentable.** Search de alta intención, PMax con inventario seleccionado y el feed orgánico siguen siendo el núcleo; no conviene escalar presupuesto hasta conciliar compras, costo y margen.\n- **Añadir un motor de recuperación.** El ranking de riesgo logra AUC 0,715 (IC 95% 0,566–0,845) y lift 2,18× al 20%; sirve para priorizar rescate con control aleatorio, no para automatizar pujas.\n- **Tratar envíos como fricción comercial.** Algunos métodos concentran más cancelación histórica. No prueba que el transporte sea la causa, pero sí justifica revisar promesas, costos y mensajes antes del pago.\n- **Experimentar antes de concluir.** Paid Social aporta mucho tráfico y poco ingreso atribuido; geografía aporta hipótesis, pero no justifica exclusiones con esta muestra."
+      },
+      {
+        "id": "metrics",
+        "type": "metric-strip",
+        "cardIds": [
+          "card_auc",
+          "card_pr",
+          "card_lift",
+          "card_gmv"
+        ]
+      },
+      {
+        "id": "model_section",
+        "type": "markdown",
+        "body": "## Señal predictiva útil, todavía no estable\n\nSe entrenó sólo con variables disponibles al crear el pedido. Se excluyeron estado de despacho, información de pago, seguimiento y factura para evitar leakage. La regresión logística ganó al random forest y es más fácil de auditar. Los backtests mensuales varían: mantener el score en piloto hasta acumular más positivos."
+      },
+      {
+        "id": "lift_chart_block",
+        "type": "chart",
+        "chartId": "chart_lift"
+      },
+      {
+        "id": "stability_table_block",
+        "type": "table",
+        "tableId": "table_stability"
+      },
+      {
+        "id": "channel_section",
+        "type": "markdown",
+        "body": "## Canales: corregir medición antes de escalar\n\nEl snapshot de GA4 muestra una brecha grande entre volumen y valor en Paid Social. Direct también concentra 30,7% del ingreso, compatible con fuga de atribución. Organic Shopping aparece extraordinariamente eficiente, pero con sólo 241 sesiones y probable concentración en pocas compras. Sin costo publicitario no hay ROAS comparable."
+      },
+      {
+        "id": "channel_chart_block",
+        "type": "chart",
+        "chartId": "chart_channel_share"
+      },
+      {
+        "id": "geo_section",
+        "type": "markdown",
+        "body": "## Geografía: segmentar mensajes y pruebas, no excluir\n\nMetropolitana domina volumen. Maule y Antofagasta muestran ticket histórico alto con baja cancelación; Valparaíso combina volumen razonable y 8% de cancelación. Biobío (16,7%) y Araucanía (26,7%) sugieren fricción de despacho/pago. Las muestras regionales son pequeñas y no incluyen costo, impresiones ni margen."
+      },
+      {
+        "id": "geo_chart_block",
+        "type": "chart",
+        "chartId": "chart_geo"
+      },
+      {
+        "id": "shipping_table_block",
+        "type": "table",
+        "tableId": "table_shipping"
+      },
+      {
+        "id": "fabian_shipping_section",
+        "type": "markdown",
+        "sourceId": "src_shipping",
+        "body": "## Para Fabián: el envío ya es un tema de ventas\n\n**La evidencia no acusa a un courier; muestra una fricción que el negocio debe investigar.** Chilexpress tuvo 7 cancelaciones en 31 pedidos (22,6%), Starken por pagar 5 en 28 (17,9%), retiro en tienda 8 en 57 (14,0%) y Bluexpress 3 en 27 (11,1%). En contraste, Prioritario a domicilio tuvo 2 en 109 (1,8%) y Estándar a domicilio 0 en 47. Diferencias de ticket, región y producto pueden explicar parte de la brecha, por lo que esto es una señal operativa, no una conclusión causal.\n\n**Cómo convertir la señal en acción:**\n\n1. Mostrar costo total, operador y rango de entrega antes del pago, especialmente cuando el despacho queda ‘por pagar’.\n2. Revisar los pedidos cancelados de los cuatro métodos con mayor tasa y registrar un motivo estándar: costo inesperado, plazo, cobertura, retiro, medio de pago u otro.\n3. En Biobío y Araucanía, probar una variante de anuncio/checkout con promesa logística explícita.\n4. Medir semanalmente cancelación por método y región junto con ticket y margen; no evaluar a logística sólo por despacho completado.\n5. Dar al equipo de ventas una alerta para rescatar pedidos de alto valor cuando el método y el score indiquen riesgo.\n\n**El mensaje para la operación:** una promesa de despacho poco clara puede perder la venta antes de que exista un problema logístico real. Reducir esa incertidumbre es parte de conversión, no sólo de postventa."
+      },
+      {
+        "id": "plan_section",
+        "type": "markdown",
+        "body": "## Estrategia que vamos a seguir para aumentar ventas\n\n**Objetivo rector: aumentar pedidos pagados rentables, no sesiones.** La estrategia combina cuatro motores que se refuerzan entre sí:\n\n1. **Medición confiable.** Reparar los pasos de checkout, validar ID/valor/moneda de compra y persistir UTM/GCLID/campaña hasta el pedido. Sin esto no se sube presupuesto ni se fija tROAS.\n2. **Captura de demanda.** Mantener Search de alta intención como referencia; sostener PMax con las diez marcas y stock rentable ya seleccionados; proteger fichas y Free Listings. Escalar sólo después de compras conciliadas y margen sostenible, en incrementos máximos de 15–20% cada 5–7 días.\n3. **Recuperación de demanda perdida.** Puntuar pedidos y, dentro de cada decil, asignar 80% a recordatorio y 20% a control. Contactar a 10–15 minutos y medir pago a 24 horas, margen incremental, reclamos y bajas.\n4. **Aprendizaje por campañas.** En Paid Social probar creatividad y landing antes de comprar más alcance. En geografía, probar Valparaíso, Antofagasta y Maule con presupuestos pequeños; en Biobío/Araucanía probar claridad logística.\n\n**Reglas de decisión:** mantener campañas ganadoras por margen, no por volumen; no excluir regiones por este análisis; pausar una prueba cuando la medición falle; y convertir cada cambio relevante en control vs. tratamiento."
+      },
+      {
+        "id": "community_section",
+        "type": "markdown",
+        "body": "## Qué aporta la comunidad y la evidencia\n\nLa experiencia compartida por practitioners coincide en dos riesgos: tratamiento/control históricos suelen estar sesgados y los uplift models se degradan con ofertas cambiantes ([discusión 1](https://www.reddit.com/r/datascience/comments/v65rja/), [discusión 2](https://www.reddit.com/r/datascience/comments/1ijptot/)). La literatura recomienda optimizar **utilidad incremental**, no sólo respuesta ([profit uplift](https://link.springer.com/article/10.1007/s11573-021-01068-3)); enfoques retrospectivos existen, pero requieren supuestos y datos de exposición ausentes aquí ([Booking.com](https://arxiv.org/abs/2008.06293)). Google Ads permite experimentos con división de tráfico y pruebas de lift en Performance Max ([Experiments](https://support.google.com/google-ads/answer/10682377), [PMax experiments](https://support.google.com/google-ads/answer/12997711))."
+      },
+      {
+        "id": "questions_section",
+        "type": "markdown",
+        "body": "## Preguntas que la siguiente versión debe responder\n\n- ¿Cuál es el margen neto por campaña, producto y región después de despacho?\n- ¿Qué porcentaje de pedidos cancelados declara costo o plazo de envío como motivo?\n- ¿Cuánto rescate incremental genera el mensaje frente al control?\n- ¿Paid Social mejora cuando optimiza a compra medida correctamente, o sólo aporta alcance?\n- ¿PMax genera ventas nuevas o captura demanda que habría convertido por Search/Direct?"
+      },
+      {
+        "id": "caveats_section",
+        "type": "markdown",
+        "body": "## Límites y siguiente dataset\n\nEl export cubre 524 pedidos, 90 días y 39 cancelaciones; no contiene líneas de producto, margen, sesiones no compradoras, costo, impresiones ni tratamiento/control. El funnel observado registró 136 `begin_checkout` y cero pasos posteriores aunque otros reportes sí muestran compras, por lo que hay inconsistencia de instrumentación. Para un modelo de compra/recompra y asignación de presupuesto se necesitan 12+ meses, productos, margen, identidad de campaña persistida, costo y un holdout experimental. En pruebas regionales revisar si Ads usa ‘presencia’ o ‘presencia o interés’, porque la opción predeterminada puede mezclar ubicación física e interés ([Google Ads](https://support.google.com/google-ads/answer/1722038))."
+      }
+    ]
+  },
+  "snapshot": {
+    "version": 1,
+    "generatedAt": "2026-08-29T21:20:00-04:00",
+    "status": "ready",
+    "datasets": {
+      "kpis": [
+        {
+          "auc": 0.7154276578737011,
+          "auc_ci_low": 0.5663855638178533,
+          "auc_ci_high": 0.8452565662237197,
+          "pr_auc": 0.2765707314759295,
+          "pr_baseline": 0.11464968152866242,
+          "lift20": 2.1805555555555554,
+          "capture20": 0.4444444444444444,
+          "gmv_capture_clp": 2268512.0,
+          "gmv_capture_share": 0.6764862265627912
+        }
+      ],
+      "lift": [
+        {
+          "population_share": 0.1,
+          "orders_contacted": 16,
+          "cancellations_captured": 6,
+          "capture_rate": 0.3333333333,
+          "lift": 3.2708333333,
+          "cancelled_gmv_captured_clp": 1745008.0,
+          "cancelled_gmv_capture_rate": 0.5203736534,
+          "population_pct": 0.1,
+          "random_capture_rate": 0.1
+        },
+        {
+          "population_share": 0.2,
+          "orders_contacted": 32,
+          "cancellations_captured": 8,
+          "capture_rate": 0.4444444444,
+          "lift": 2.1805555556,
+          "cancelled_gmv_captured_clp": 2268512.0,
+          "cancelled_gmv_capture_rate": 0.6764862266,
+          "population_pct": 0.2,
+          "random_capture_rate": 0.2
+        },
+        {
+          "population_share": 0.3,
+          "orders_contacted": 48,
+          "cancellations_captured": 11,
+          "capture_rate": 0.6111111111,
+          "lift": 1.9988425926,
+          "cancelled_gmv_captured_clp": 2603507.0,
+          "cancelled_gmv_capture_rate": 0.7763840907,
+          "population_pct": 0.3,
+          "random_capture_rate": 0.3
+        },
+        {
+          "population_share": 0.5,
+          "orders_contacted": 79,
+          "cancellations_captured": 15,
+          "capture_rate": 0.8333333333,
+          "lift": 1.6561181435,
+          "cancelled_gmv_captured_clp": 3176405.0,
+          "cancelled_gmv_capture_rate": 0.9472263019,
+          "population_pct": 0.5,
+          "random_capture_rate": 0.5
+        },
+        {
+          "population_share": 1.0,
+          "orders_contacted": 157,
+          "cancellations_captured": 18,
+          "capture_rate": 1.0,
+          "lift": 1.0,
+          "cancelled_gmv_captured_clp": 3353375.0,
+          "cancelled_gmv_capture_rate": 1.0,
+          "population_pct": 1.0,
+          "random_capture_rate": 1.0
+        }
+      ],
+      "stability": [
+        {
+          "test_month": "2026-05",
+          "train_orders": 242,
+          "train_cancellations": 11,
+          "test_orders": 168,
+          "test_cancellations": 20,
+          "roc_auc": 0.577027027,
+          "pr_auc": 0.1973413524,
+          "prevalence": 0.119047619
+        },
+        {
+          "test_month": "2026-06",
+          "train_orders": 410,
+          "train_cancellations": 31,
+          "test_orders": 114,
+          "test_cancellations": 8,
+          "roc_auc": 0.6674528302,
+          "pr_auc": 0.1882426319,
+          "prevalence": 0.0701754386
+        }
+      ],
+      "geo": [
+        {
+          "region": "Metropolitana",
+          "orders": 288,
+          "cancellations": 19,
+          "paid_orders": 269,
+          "paid_revenue_clp": 28085875.0,
+          "cancellation_rate": 0.0659722222,
+          "paid_aov_clp": 104408.4572490706
+        },
+        {
+          "region": "Valparaíso",
+          "orders": 50,
+          "cancellations": 4,
+          "paid_orders": 46,
+          "paid_revenue_clp": 5318594.0,
+          "cancellation_rate": 0.08,
+          "paid_aov_clp": 115621.6086956522
+        },
+        {
+          "region": "Biobío",
+          "orders": 36,
+          "cancellations": 6,
+          "paid_orders": 30,
+          "paid_revenue_clp": 3016011.0,
+          "cancellation_rate": 0.1666666667,
+          "paid_aov_clp": 100533.7
+        },
+        {
+          "region": "Maule",
+          "orders": 28,
+          "cancellations": 0,
+          "paid_orders": 28,
+          "paid_revenue_clp": 4864515.0,
+          "cancellation_rate": 0.0,
+          "paid_aov_clp": 173732.6785714286
+        },
+        {
+          "region": "Los Lagos",
+          "orders": 22,
+          "cancellations": 1,
+          "paid_orders": 21,
+          "paid_revenue_clp": 1856076.0,
+          "cancellation_rate": 0.0454545455,
+          "paid_aov_clp": 88384.5714285714
+        },
+        {
+          "region": "Antofagasta",
+          "orders": 19,
+          "cancellations": 1,
+          "paid_orders": 18,
+          "paid_revenue_clp": 3225525.0,
+          "cancellation_rate": 0.0526315789,
+          "paid_aov_clp": 179195.8333333333
+        },
+        {
+          "region": "Coquimbo",
+          "orders": 18,
+          "cancellations": 2,
+          "paid_orders": 16,
+          "paid_revenue_clp": 1606791.0,
+          "cancellation_rate": 0.1111111111,
+          "paid_aov_clp": 100424.4375
+        },
+        {
+          "region": "Araucanía",
+          "orders": 15,
+          "cancellations": 4,
+          "paid_orders": 11,
+          "paid_revenue_clp": 1315352.0,
+          "cancellation_rate": 0.2666666667,
+          "paid_aov_clp": 119577.4545454545
+        },
+        {
+          "region": "Atacama",
+          "orders": 12,
+          "cancellations": 0,
+          "paid_orders": 12,
+          "paid_revenue_clp": 935082.0,
+          "cancellation_rate": 0.0,
+          "paid_aov_clp": 77923.5
+        },
+        {
+          "region": "O’Higgins",
+          "orders": 11,
+          "cancellations": 0,
+          "paid_orders": 11,
+          "paid_revenue_clp": 1615522.0,
+          "cancellation_rate": 0.0,
+          "paid_aov_clp": 146865.6363636364
+        }
+      ],
+      "shipping": [
+        {
+          "shipping_method": "Prioritario a domicilio",
+          "orders": 109,
+          "cancellations": 2,
+          "paid_orders": 107,
+          "paid_revenue_clp": 5852150.0,
+          "cancellation_rate": 0.0183486239,
+          "paid_aov_clp": 54692.9906542056
+        },
+        {
+          "shipping_method": "Envío Sagás RM",
+          "orders": 102,
+          "cancellations": 7,
+          "paid_orders": 95,
+          "paid_revenue_clp": 17022545.0,
+          "cancellation_rate": 0.068627451,
+          "paid_aov_clp": 179184.6842105263
+        },
+        {
+          "shipping_method": "Sin método",
+          "orders": 83,
+          "cancellations": 4,
+          "paid_orders": 79,
+          "paid_revenue_clp": 4001097.0,
+          "cancellation_rate": 0.0481927711,
+          "paid_aov_clp": 50646.7974683544
+        },
+        {
+          "shipping_method": "Sagás Music Shop Adress",
+          "orders": 57,
+          "cancellations": 8,
+          "paid_orders": 49,
+          "paid_revenue_clp": 5563604.0,
+          "cancellation_rate": 0.1403508772,
+          "paid_aov_clp": 113542.9387755102
+        },
+        {
+          "shipping_method": "Estándar a domicilio",
+          "orders": 47,
+          "cancellations": 0,
+          "paid_orders": 47,
+          "paid_revenue_clp": 3174651.0,
+          "cancellation_rate": 0.0,
+          "paid_aov_clp": 67545.7659574468
+        },
+        {
+          "shipping_method": "Chilexpress",
+          "orders": 31,
+          "cancellations": 7,
+          "paid_orders": 24,
+          "paid_revenue_clp": 3696078.0,
+          "cancellation_rate": 0.2258064516,
+          "paid_aov_clp": 154003.25
+        },
+        {
+          "shipping_method": "Envió por pagar (Starken)",
+          "orders": 28,
+          "cancellations": 5,
+          "paid_orders": 23,
+          "paid_revenue_clp": 3991980.0,
+          "cancellation_rate": 0.1785714286,
+          "paid_aov_clp": 173564.347826087
+        },
+        {
+          "shipping_method": "Starken",
+          "orders": 28,
+          "cancellations": 2,
+          "paid_orders": 26,
+          "paid_revenue_clp": 6370742.0,
+          "cancellation_rate": 0.0714285714,
+          "paid_aov_clp": 245028.5384615385
+        },
+        {
+          "shipping_method": "Bluexpress",
+          "orders": 27,
+          "cancellations": 3,
+          "paid_orders": 24,
+          "paid_revenue_clp": 4160573.0,
+          "cancellation_rate": 0.1111111111,
+          "paid_aov_clp": 173357.2083333333
+        }
+      ],
+      "channels": [
+        {
+          "scope": "channel",
+          "segment": "Paid Social",
+          "users_or_sessions": 29335,
+          "revenue_clp": 339860,
+          "share_volume": 0.7164,
+          "share_revenue": 0.0721,
+          "period": "2026-08-01/2026-08-28",
+          "source_note": "GA4 authenticated UI snapshot",
+          "revenue_per_1000_sessions_clp": 11585.4780978354
+        },
+        {
+          "scope": "channel",
+          "segment": "Paid Search",
+          "users_or_sessions": 3004,
+          "revenue_clp": 1052290,
+          "share_volume": 0.0734,
+          "share_revenue": 0.2233,
+          "period": "2026-08-01/2026-08-28",
+          "source_note": "GA4 authenticated UI snapshot",
+          "revenue_per_1000_sessions_clp": 350296.2716378162
+        },
+        {
+          "scope": "channel",
+          "segment": "Organic Search",
+          "users_or_sessions": 2261,
+          "revenue_clp": 877701,
+          "share_volume": 0.0552,
+          "share_revenue": 0.1862,
+          "period": "2026-08-01/2026-08-28",
+          "source_note": "GA4 authenticated UI snapshot",
+          "revenue_per_1000_sessions_clp": 388191.5081822203
+        },
+        {
+          "scope": "channel",
+          "segment": "Direct",
+          "users_or_sessions": 2024,
+          "revenue_clp": 1447436,
+          "share_volume": 0.0494,
+          "share_revenue": 0.3071,
+          "period": "2026-08-01/2026-08-28",
+          "source_note": "GA4 authenticated UI snapshot",
+          "revenue_per_1000_sessions_clp": 715136.3636363636
+        },
+        {
+          "scope": "channel",
+          "segment": "Cross-network",
+          "users_or_sessions": 1676,
+          "revenue_clp": 279671,
+          "share_volume": 0.0409,
+          "share_revenue": 0.0593,
+          "period": "2026-08-01/2026-08-28",
+          "source_note": "GA4 authenticated UI snapshot",
+          "revenue_per_1000_sessions_clp": 166868.138424821
+        },
+        {
+          "scope": "channel",
+          "segment": "Organic Social",
+          "users_or_sessions": 1632,
+          "revenue_clp": 0,
+          "share_volume": 0.0399,
+          "share_revenue": 0.0,
+          "period": "2026-08-01/2026-08-28",
+          "source_note": "GA4 authenticated UI snapshot",
+          "revenue_per_1000_sessions_clp": 0.0
+        },
+        {
+          "scope": "channel",
+          "segment": "Organic Shopping",
+          "users_or_sessions": 241,
+          "revenue_clp": 715993,
+          "share_volume": 0.0059,
+          "share_revenue": 0.1519,
+          "period": "2026-08-01/2026-08-28",
+          "source_note": "GA4 authenticated UI snapshot",
+          "revenue_per_1000_sessions_clp": 2970925.311203319
+        }
+      ],
+      "channel_shares": [
+        {
+          "segment": "Paid Social",
+          "users_or_sessions": 29335,
+          "revenue_clp": 339860,
+          "revenue_per_1000_sessions_clp": 11585.4780978354,
+          "measure": "Sesiones",
+          "share": 0.7164
+        },
+        {
+          "segment": "Paid Search",
+          "users_or_sessions": 3004,
+          "revenue_clp": 1052290,
+          "revenue_per_1000_sessions_clp": 350296.2716378162,
+          "measure": "Sesiones",
+          "share": 0.0734
+        },
+        {
+          "segment": "Organic Search",
+          "users_or_sessions": 2261,
+          "revenue_clp": 877701,
+          "revenue_per_1000_sessions_clp": 388191.5081822203,
+          "measure": "Sesiones",
+          "share": 0.0552
+        },
+        {
+          "segment": "Direct",
+          "users_or_sessions": 2024,
+          "revenue_clp": 1447436,
+          "revenue_per_1000_sessions_clp": 715136.3636363636,
+          "measure": "Sesiones",
+          "share": 0.0494
+        },
+        {
+          "segment": "Cross-network",
+          "users_or_sessions": 1676,
+          "revenue_clp": 279671,
+          "revenue_per_1000_sessions_clp": 166868.138424821,
+          "measure": "Sesiones",
+          "share": 0.0409
+        },
+        {
+          "segment": "Organic Social",
+          "users_or_sessions": 1632,
+          "revenue_clp": 0,
+          "revenue_per_1000_sessions_clp": 0.0,
+          "measure": "Sesiones",
+          "share": 0.0399
+        },
+        {
+          "segment": "Organic Shopping",
+          "users_or_sessions": 241,
+          "revenue_clp": 715993,
+          "revenue_per_1000_sessions_clp": 2970925.311203319,
+          "measure": "Sesiones",
+          "share": 0.0059
+        },
+        {
+          "segment": "Paid Social",
+          "users_or_sessions": 29335,
+          "revenue_clp": 339860,
+          "revenue_per_1000_sessions_clp": 11585.4780978354,
+          "measure": "Ingresos",
+          "share": 0.0721
+        },
+        {
+          "segment": "Paid Search",
+          "users_or_sessions": 3004,
+          "revenue_clp": 1052290,
+          "revenue_per_1000_sessions_clp": 350296.2716378162,
+          "measure": "Ingresos",
+          "share": 0.2233
+        },
+        {
+          "segment": "Organic Search",
+          "users_or_sessions": 2261,
+          "revenue_clp": 877701,
+          "revenue_per_1000_sessions_clp": 388191.5081822203,
+          "measure": "Ingresos",
+          "share": 0.1862
+        },
+        {
+          "segment": "Direct",
+          "users_or_sessions": 2024,
+          "revenue_clp": 1447436,
+          "revenue_per_1000_sessions_clp": 715136.3636363636,
+          "measure": "Ingresos",
+          "share": 0.3071
+        },
+        {
+          "segment": "Cross-network",
+          "users_or_sessions": 1676,
+          "revenue_clp": 279671,
+          "revenue_per_1000_sessions_clp": 166868.138424821,
+          "measure": "Ingresos",
+          "share": 0.0593
+        },
+        {
+          "segment": "Organic Social",
+          "users_or_sessions": 1632,
+          "revenue_clp": 0,
+          "revenue_per_1000_sessions_clp": 0.0,
+          "measure": "Ingresos",
+          "share": 0.0
+        },
+        {
+          "segment": "Organic Shopping",
+          "users_or_sessions": 241,
+          "revenue_clp": 715993,
+          "revenue_per_1000_sessions_clp": 2970925.311203319,
+          "measure": "Ingresos",
+          "share": 0.1519
+        }
+      ]
+    }
+  },
+  "sources": [
+    {
+      "id": "src_model",
+      "label": "Backtest temporal del modelo",
+      "path": "data/model-results/metrics.json",
+      "query": {
+        "engine": "duckdb",
+        "sql": "SELECT * FROM read_json_auto('data/model-results/metrics.json')",
+        "language": "sql",
+        "description": "Regresión logística regularizada y random forest comparados con TimeSeriesSplit; holdout final = 30% más reciente.",
+        "tables_used": [
+          "data/model-results/metrics.json"
+        ],
+        "filters": [
+          "Estado de Pago en Pagado/Cancelada",
+          "Fecha y Total válidos",
+          "Sólo variables disponibles al crear el pedido"
+        ],
+        "metric_definitions": [
+          "ROC-AUC: probabilidad de ordenar un cancelado por encima de un pagado.",
+          "PR-AUC: precisión promedio a lo largo de niveles de recall; baseline = prevalencia del holdout.",
+          "Lift@20%: tasa de cancelación del 20% con mayor score dividida por la tasa del holdout."
+        ],
+        "executed_at": "2026-08-29T21:20:00-04:00"
+      }
+    },
+    {
+      "id": "src_lift",
+      "label": "Curva de lift del holdout",
+      "path": "data/model-results/lift_curve.csv",
+      "query": {
+        "engine": "duckdb",
+        "sql": "SELECT * FROM read_csv_auto('data/model-results/lift_curve.csv', header=true)",
+        "language": "sql",
+        "description": "Pedidos del holdout ordenados por score descendente y acumulados por profundidad de contacto.",
+        "tables_used": [
+          "data/model-results/lift_curve.csv"
+        ],
+        "filters": [
+          "Holdout temporal: 157 pedidos posteriores a 2026-05-25 16:45"
+        ],
+        "metric_definitions": [
+          "Capture rate: cancelaciones dentro del tramo / 18 cancelaciones del holdout."
+        ],
+        "executed_at": "2026-08-29T21:20:00-04:00"
+      }
+    },
+    {
+      "id": "src_geo",
+      "label": "Pedidos históricos agregados por región",
+      "path": "data/model-results/geo_segments.csv",
+      "query": {
+        "engine": "duckdb",
+        "sql": "SELECT * FROM read_csv_auto('data/model-results/geo_segments.csv', header=true) WHERE orders >= 10",
+        "language": "sql",
+        "description": "Agregación sin PII de pedidos, cancelaciones, ingreso pagado y ticket promedio por región.",
+        "tables_used": [
+          "data/model-results/geo_segments.csv"
+        ],
+        "filters": [
+          "Regiones con al menos 10 pedidos en la tabla/gráfico principal"
+        ],
+        "metric_definitions": [
+          "Tasa de cancelación = cancelaciones / pedidos.",
+          "Ticket pagado = ingreso de pedidos pagados / pedidos pagados."
+        ],
+        "executed_at": "2026-08-29T21:20:00-04:00"
+      }
+    },
+    {
+      "id": "src_ga4",
+      "label": "GA4 Sagasmusicshop.cl · snapshot autenticado",
+      "path": "data/ga4_snapshot_2026-08-29.csv",
+      "query": {
+        "engine": "duckdb",
+        "sql": "SELECT * FROM read_csv_auto('data/ga4_snapshot_2026-08-29.csv', header=true) WHERE scope IN ('channel', 'region')",
+        "description": "Lectura agregada de Traffic acquisition y Demographic details en GA4.",
+        "tables_used": [
+          "data/ga4_snapshot_2026-08-29.csv"
+        ],
+        "filters": [
+          "Periodo 2026-08-01 a 2026-08-28",
+          "Default channel group o Region"
+        ],
+        "metric_definitions": [
+          "Share de sesiones = sesiones del canal / 40.948 sesiones.",
+          "Share de ingresos = ingreso del canal / CLP 4.712.951.",
+          "Ingreso por mil sesiones = ingreso / sesiones × 1.000; no equivale a ROAS porque falta costo."
+        ],
+        "executed_at": "2026-08-29T20:25:00-04:00",
+        "language": "sql"
+      }
+    },
+    {
+      "id": "src_shipping",
+      "label": "Pedidos históricos agregados por despacho",
+      "path": "data/model-results/shipping_segments.csv",
+      "query": {
+        "engine": "duckdb",
+        "sql": "SELECT * FROM read_csv_auto('data/model-results/shipping_segments.csv', header=true) WHERE orders >= 20",
+        "language": "sql",
+        "description": "Agregación sin PII por método de envío.",
+        "tables_used": [
+          "data/model-results/shipping_segments.csv"
+        ],
+        "filters": [
+          "Métodos con al menos 20 pedidos"
+        ],
+        "metric_definitions": [
+          "Tasa de cancelación = cancelaciones / pedidos."
+        ],
+        "executed_at": "2026-08-29T21:20:00-04:00"
+      }
+    }
+  ]
+}
