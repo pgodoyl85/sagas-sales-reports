@@ -4,9 +4,9 @@ Reportes versionados de estrategia de ventas de Sagás.
 
 ## Publicación actual
 
-- Reporte: Estrategia de ventas y campañas
-- Snapshot de datos: 2026-08-29 21:20 America/Santiago
-- Versión estable: `reports/2026-08-29/`
+- Reporte: Cómo va Sagás · estrategia para aumentar ventas
+- Snapshot de datos: 2026-09-08 19:45 America/Santiago
+- Versión estable: `reports/2026-09-08/`
 - `index.html` siempre apunta a la versión más reciente publicada.
 
 ## Convención para futuras versiones
