@@ -1,0 +1,11 @@
+record_type,action_or_event,evidence,before,after,status,next_check
+action,"Presupuesto PMax","ROAS 30d 7.72; limitada por presupuesto","CLP 12000/día","CLP 14400/día","Ejecutado (+20%)","Revisar compras, valor y ROAS en 5-7 días"
+action,"Presupuesto Search","ROAS 30d 1.43; CPA aproximado CLP 61369","CLP 25000/día","CLP 22600/día","Ejecutado","No relajar objetivo hasta mejorar términos y retorno"
+action,"Tope diario activo","Reasignación entre campañas","CLP 37000/día","CLP 37000/día","Sin aumento total","Mantener durante la ventana de aprendizaje"
+action,"Negativas de competidores en Search","CLP 8471 de gasto visible y 0 conversiones en términos de competidores","14 negativas","18 negativas","Ejecutado","Revisar términos nuevos semanalmente"
+event,"view_item","Producto V100MRPGM; valor CLP 571990","Página de producto","Evento observado","Correcto","Mantener"
+event,"begin_checkout","Producto V100MRPGM; valor CLP 571990","Carrito con un producto","Evento observado","Correcto","Validar también en una compra real"
+event,"add_shipping_info","Se envía al cargar el checkout sin dirección ni método elegido","Sin selección del cliente","Evento observado","Prematuro","Corregir implementación antes de usarlo como paso del embudo"
+event,"add_payment_info","Se envía al cargar el checkout sin medio de pago elegido","Sin selección del cliente","Evento observado","Prematuro","Corregir implementación antes de usarlo como paso del embudo"
+event,"purchase","No se completó una orden ni se ingresó PII","Sin compra de prueba","No disparado","No probado","Validar transaction_id, value, currency y deduplicación con orden controlada"
+control,"Objetivo primario de Google Ads","Purchase es la única acción primaria para las campañas auditadas","Purchase primaria","Sin cambios","Protegido","No usar eventos intermedios para puja"

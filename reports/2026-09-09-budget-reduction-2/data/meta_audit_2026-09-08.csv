@@ -1,0 +1,24 @@
+section,name,objective,status,spend_clp,budget_daily_clp,result_count,result_type,purchase_value_clp,roas,reach,frequency,impressions,link_clicks,link_ctr,landing_page_views,cost_per_result_clp,integration,match_quality,value,unit,note
+campaign,Conversion x Catalogo,Ventas por catálogo,Activa,749551,25000,33,Compras web,6635561,8.85,139392,6.497159,905652,29667,0.03275762,24889,22714,,,,,"Ventana 7 días clic, 1 día visualización y 1 día visualización interesada"
+campaign,Sagas Visitas,Tráfico a landing,Activa,114473,5500,13707,Vistas de landing,,0.14,77677,2.988787,232160,15814,0.06811682,13707,8.35,,,,,"ROAS mostrado por Meta; la campaña optimiza vistas, no compras"
+creative,Coleccion completa,Ventas por catálogo,Activa,670909,,,,,,,,808935,29008,0.0359,,,,,0.9229,share,"Participación del gasto dentro del conjunto activo filtrado"
+creative,Videos Guitarra,Ventas por catálogo,Activa,56018,,,,,,,,73407,1955,0.0266,,,,,0.0771,share,"Participación del gasto dentro del conjunto activo filtrado"
+event,ViewContent,,,,,,,,,,,,,,,,CAPI,3.0,90100,eventos,"Calidad de coincidencia baja"
+event,PageView,,,,,,,,,,,,,,,,Browser,,73000,eventos,
+event,Search,,,,,,,,,,,,,,,,CAPI,3.0,2100,eventos,"Calidad de coincidencia baja"
+event,AddToCart,,,,,,,,,,,,,,,,CAPI,3.6,801,eventos,"Calidad de coincidencia baja"
+event,InitiateCheckout,,,,,,,,,,,,,,,,CAPI,3.0,320,eventos,"Calidad de coincidencia baja"
+event,ViewCart,,,,,,,,,,,,,,,,CAPI,3.0,283,eventos,"Calidad de coincidencia baja"
+event,Lead,,,,,,,,,,,,,,,,Browser,,236,eventos,
+event,Purchase,,,,,,,,,,,,,,,,CAPI,6.8,66,eventos,"Recibido por última vez un día antes de la auditoría"
+catalog,Catálogo total,,,,,,,,,,,,,,,,,,930,productos,"Fuente Jumpseller actualizada el 8 sep a las 19:00"
+catalog,Match rate total,,,,,,,,,,,,,,,,,,0.771,share,"Meta recomienda al menos 90%"
+catalog,Match product view,,,,,,,,,,,,,,,,,,0.77,share,
+catalog,Match add to cart,,,,,,,,,,,,,,,,,,0.983,share,
+catalog,Match purchase,,,,,,,,,,,,,,,,,,1.0,share,
+catalog,Productos interactuados eliminados,,,,,,,,,,,,,,,,,,195,productos,"Reduce la capacidad de retargeting dinámico"
+catalog,Productos con problemas en feed,,,,,,,,,,,,,,,,,,12,productos,"Fuente Jumpseller"
+catalog,Productos eliminados últimos 7 días,,,,,,,,,,,,,,,,,,129,productos,"Resumen de sincronización"
+diagnostic,Gasto afectado por baja calidad de datos,,,,,,,,,,,,,,,,,,167747,CLP,"Estimación mostrada por Meta"
+diagnostic,Advanced matching manual,,,,,,,,,,,,,,,,,,0,configurado,"No configurado; requiere evaluación de privacidad antes de activar"
+draft,Guitarras,Tráfico,Con cambios sin publicar,,,,,,,,,,,,,,,,,,"Borrador con error: falta seleccionar un video; no está entregando y no se modificó"
