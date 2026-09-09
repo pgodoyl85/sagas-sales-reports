@@ -1,0 +1,35 @@
+section,segment,period,sessions,revenue_clp,spend_clp,conversions,roas,count,status
+ga4_total,Total,2026-08-11/2026-09-07,39631,5965646,,,,,
+ga4_total,Total,2026-07-14/2026-08-10,37344,5988357,,,,,
+ga4_campaign,Meta campaigns combined,2026-08-11/2026-09-07,26751,370589,,,,,
+ga4_campaign,Meta campaigns combined,2026-07-14/2026-08-10,26033,212778,,,,,
+ga4_campaign,PMax | Ventas no-brand | Stock rentable | Ago 2026,2026-08-11/2026-09-07,2635,2147830,,,,,
+ga4_campaign,PMax | Ventas no-brand | Stock rentable | Ago 2026,2026-07-14/2026-08-10,0,0,,,,,
+ga4_campaign,Search 2024,2026-08-11/2026-09-07,2156,350860,,,,,
+ga4_campaign,Search 2024,2026-07-14/2026-08-10,3382,2044727,,,,,
+ga4_campaign,Organic,2026-08-11/2026-09-07,2327,1162692,,,,,
+ga4_campaign,Organic,2026-07-14/2026-08-10,2060,679324,,,,,
+ga4_campaign,Direct,2026-08-11/2026-09-07,1963,1000119,,,,,
+ga4_campaign,Direct,2026-07-14/2026-08-10,1961,1257507,,,,,
+ga4_campaign,Not set,2026-08-11/2026-09-07,2141,596117,,,,,
+ga4_campaign,Not set,2026-07-14/2026-08-10,419,734678,,,,,
+ga4_campaign,Shopping Free Listings,2026-08-11/2026-09-07,195,337439,,,,,
+ga4_campaign,Shopping Free Listings,2026-07-14/2026-08-10,303,430363,,,,,
+ga4_campaign,Referral,2026-08-11/2026-09-07,1095,0,,,,,
+ga4_campaign,Referral,2026-07-14/2026-08-10,1949,528980,,,,,
+ga4_campaign,Other,2026-08-11/2026-09-07,368,0,,,,,
+ga4_campaign,Other,2026-07-14/2026-08-10,1237,100000,,,,,
+ads_total,Google Ads account,2026-09-01/2026-09-08,,1404341.37,149658,3.99,9.38,,
+ads_total,Google Ads account,2026-08-24/2026-08-31,,525651,187515,3.00,2.80,,
+ads_campaign,PMax | Ventas no-brand | Stock rentable | Ago 2026,2026-09-01/2026-09-08,,1404341.37,96715,3.99,14.52,,Limited by budget
+ads_campaign,Search 2024,2026-09-01/2026-09-08,,0,52942,0,0,,Limited by target
+ads_search_30d,Search 2024,2026-08-09/2026-09-07,,,324029,5.28,,,Observed CPA CLP 61369; target CPA CLP 13678; conversions -72.28% vs prior 30d
+ads_search_structure,Enabled or paused keywords,2026-09-08,,,,,,183,Keyword inventory
+ads_search_structure,Negative keywords,2026-09-08,,,,,,14,Campaign and ad-group negatives
+tracking,GTM tagged pages,2026-09-08,,,,,,1695,Tagged
+tracking,GTM untagged pages,2026-09-08,,,,,,23,Untagged
+tracking,GTM untagged URLs verified HTTP 404,2026-09-08,,,,,,23,All 23 returned HTTP 404
+tracking,GTM pages without recent data,2026-09-08,,,,,,478,No recent data
+tracking,GTM pending workspace changes,2026-09-08,,,,,,0,Pending changes
+tracking,Google Ads conversion actions recording,2026-09-08,,,,,,4,Recording
+tracking,Google Ads conversion actions without recent conversions,2026-09-08,,,,,,5,No recent conversions

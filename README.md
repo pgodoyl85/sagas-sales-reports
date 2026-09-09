@@ -4,16 +4,16 @@ Reportes versionados de estrategia de ventas de Sagás.
 
 ## Publicación actual
 
-- Reporte: Cómo va Sagás · estrategia para aumentar ventas
-- Snapshot de datos: 2026-09-08 19:45 America/Santiago
-- Versión estable: `reports/2026-09-08/`
+- Reporte: Cómo va Sagás · estrategia ejecutada al 8 de septiembre
+- Snapshot de datos: 2026-09-08 21:53 America/Santiago
+- Versión estable: `reports/2026-09-08-execution/`
 - `index.html` siempre apunta a la versión más reciente publicada.
 
 ## Convención para futuras versiones
 
 Cada actualización debe:
 
-1. Mantener una copia inmutable en `reports/YYYY-MM-DD/`.
+1. Mantener una copia inmutable en `reports/YYYY-MM-DD/`; si hay más de un checkpoint el mismo día, usar `reports/YYYY-MM-DD-descriptor/`.
 2. Reemplazar `index.html` y `artifact.json` con la versión vigente.
 3. Conservar sólo datos agregados sin correos, teléfonos ni direcciones.
 4. Registrar el cambio en un commit antes de publicar GitHub Pages.
