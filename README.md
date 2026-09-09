@@ -5,8 +5,8 @@ Reportes versionados de estrategia de ventas de Sagás.
 ## Publicación actual
 
 - Reporte: Sagás: estrategia de ventas en ejecución
-- Snapshot de datos: 2026-09-09 11:37 America/Santiago
-- Versión estable: `reports/2026-09-09-meta-execution/`
+- Snapshot de datos: 2026-09-09 12:08 America/Santiago
+- Versión estable: `reports/2026-09-09-budget-reduction/`
 - `index.html` siempre apunta a la versión más reciente publicada.
 
 ## Convención para futuras versiones
